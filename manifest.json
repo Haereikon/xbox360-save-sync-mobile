@@ -2,20 +2,21 @@
   "name": "Xbox 360 Save Manager Mobile",
   "short_name": "Xbox 360 Sync",
   "description": "Sincronizador FTP de Save Files de Xbox 360 RGH para Celular Android / iOS",
-  "start_url": "./index.html",
+  "start_url": "/xbox360-save-sync-mobile/",
+  "scope": "/xbox360-save-sync-mobile/",
   "display": "standalone",
   "background_color": "#0b0f19",
   "theme_color": "#10b981",
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "icon-192.png",
+      "src": "https://haereikon.github.io/xbox360-save-sync-mobile/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "icon-512.png",
+      "src": "https://haereikon.github.io/xbox360-save-sync-mobile/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
