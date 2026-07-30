@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Xbox 360 Save Manager Mobile</title>
+  
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#10b981">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Xbox Sync">
+
+  <!-- Google Fonts & FontAwesome -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Custom Mobile CSS -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="mobile-app">
+
+    <!-- Top Mobile Header -->
+    <header class="mobile-header">
+      <div class="mobile-brand">
+        <i class="fa-brands fa-xbox brand-icon"></i>
+        <div>
+          <h1>Xbox 360 Sync</h1>
+          <span class="sub-text">Mobile RGH Save Sync</span>
+        </div>
+      </div>
+      <button id="btn-mobile-config" class="btn-icon-mobile" title="Configurações">
+        <i class="fa-solid fa-gear"></i>
+      </button>
+    </header>
+
+    <!-- Mobile Console Live Status Bar -->
+    <div class="mobile-status-strip">
+      <div class="status-chip" id="chip-a">
+        <span class="dot offline" id="dot-a"></span>
+        <span id="name-a">Sala</span>: <span id="text-a">Conectando...</span>
+      </div>
+      <div class="status-chip" id="chip-b">
+        <span class="dot offline" id="dot-b"></span>
+        <span id="name-b">Quarto</span>: <span id="text-b">Conectando...</span>
+      </div>
+    </div>
+
+    <!-- Main Content Container -->
+    <main class="mobile-main">
+
+      <!-- VIEW 1: Sincronização & Análise -->
+      <section id="view-sync" class="mobile-view active">
+        <div class="mobile-card hero-card">
+          <div class="hero-card-header">
+            <i class="fa-solid fa-user-gear hero-icon"></i>
+            <div>
+              <h2>Sincronização de Saves</h2>
+              <p>Escolha um perfil e compare as datas dos saves antes de aplicar.</p>
+            </div>
+          </div>
+
+          <div class="mobile-field-group">
+            <label for="profileSelect"><i class="fa-solid fa-id-card"></i> Perfil Selecionado:</label>
+            <div class="select-with-btn">
+              <select id="profileSelect" class="mobile-select">
+                <option value="ALL">Carregando perfis dos consoles...</option>
+              </select>
+              <button id="btnRefreshProfiles" class="btn-icon-square" title="Atualizar Perfis">
+                <i class="fa-solid fa-arrows-rotate"></i>
+              </button>
+              <button id="btnAliasProfile" class="btn-icon-square" title="Apelidar Perfil">
+                <i class="fa-solid fa-pen-to-square"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="hero-actions">
+            <button id="btnStartSync" class="btn-mobile-primary">
+              <i class="fa-solid fa-magnifying-glass-chart"></i> Analisar Comparação
+            </button>
+            <button id="btnOpenProfileInBrowser" class="btn-mobile-secondary">
+              <i class="fa-solid fa-folder-open"></i> Abrir Pastas do Perfil
+            </button>
+          </div>
+        </div>
+
+        <!-- Resumo da Análise (Quando Ativo) -->
+        <div class="mobile-card hidden" id="card-analysis-summary">
+          <div class="card-title">
+            <i class="fa-solid fa-chart-pie"></i>
+            <h3>Relatório da Comparação</h3>
+          </div>
+          <div class="summary-chips">
+            <div class="sum-chip chip-green"><strong id="count-newer">0</strong> +Recentes</div>
+            <div class="sum-chip chip-purple"><strong id="count-new">0</strong> Novos</div>
+            <div class="sum-chip chip-gray"><strong id="count-identical">0</strong> Idênticos</div>
+          </div>
+          <div class="analysis-list" id="mobile-analysis-list">
+            <!-- Lista de saves analisados -->
+          </div>
+          <button id="btnExecuteSync" class="btn-mobile-success" style="margin-top: 12px;">
+            <i class="fa-solid fa-rocket"></i> Confirmar e Sincronizar
+          </button>
+        </div>
+      </section>
+
+      <!-- VIEW 2: File Browser (Navegador com Abas) -->
+      <section id="view-browser" class="mobile-view hidden">
+        <div class="pane-tabs">
+          <button class="tab-btn active" id="tab-btn-a">
+            <i class="fa-solid fa-tv"></i> <span id="tab-label-a">Console A</span>
+          </button>
+          <button class="tab-btn" id="tab-btn-b">
+            <i class="fa-solid fa-tv"></i> <span id="tab-label-b">Console B</span>
+          </button>
+        </div>
+
+        <!-- Address Bar -->
+        <div class="mobile-address-bar">
+          <i class="fa-regular fa-folder-open"></i>
+          <input type="text" id="mobile-path-input" value="Hdd1/Content/0000000000000000/">
+          <button id="btn-mobile-go" class="btn-mini">Ir</button>
+          <button id="btn-mobile-up" class="btn-mini" title="Subir Pasta"><i class="fa-solid fa-level-up-alt"></i></button>
+          <button id="btn-mobile-refresh" class="btn-mini" title="Atualizar"><i class="fa-solid fa-rotate"></i></button>
+        </div>
+
+        <!-- Mobile File List -->
+        <div class="mobile-file-container">
+          <ul class="mobile-file-list" id="mobile-file-list">
+            <li class="empty-state">Carregando arquivos do console...</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- VIEW 3: Gestor de Perfis -->
+      <section id="view-profiles" class="mobile-view hidden">
+        <div class="mobile-card">
+          <div class="card-title-bar">
+            <div class="card-title">
+              <i class="fa-solid fa-id-card-clip"></i>
+              <div>
+                <h2>Gestor de Perfis</h2>
+                <p>Personalize os nomes dos perfis (XUIDs) dos consoles.</p>
+              </div>
+            </div>
+            <button id="btnRefreshProfileManager" class="btn-icon-square">
+              <i class="fa-solid fa-rotate"></i>
+            </button>
+          </div>
+
+          <div class="profile-cards-container" id="mobile-profiles-list">
+            <!-- Cards dos perfis carregados -->
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 4: Gerenciador de Backups -->
+      <section id="view-backups" class="mobile-view hidden">
+        <div class="mobile-card">
+          <div class="card-title">
+            <i class="fa-solid fa-box-archive"></i>
+            <div>
+              <h2>Backups Preventivos</h2>
+              <p>Histórico de cópias salvas antes das alterações.</p>
+            </div>
+          </div>
+          <div class="backup-list" id="mobile-backups-list">
+            <p class="empty-state">Carregando backups...</p>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Bottom Navigation Bar (Barra de Navegação Inferior) -->
+    <nav class="bottom-nav-bar">
+      <button class="nav-btn active" id="nav-btn-sync">
+        <i class="fa-solid fa-rotate"></i>
+        <span>Sync</span>
+      </button>
+      <button class="nav-btn" id="nav-btn-browser">
+        <i class="fa-solid fa-folder-tree"></i>
+        <span>Browser</span>
+      </button>
+      <button class="nav-btn" id="nav-btn-profiles">
+        <i class="fa-solid fa-user"></i>
+        <span>Perfis</span>
+      </button>
+      <button class="nav-btn" id="nav-btn-backups">
+        <i class="fa-solid fa-box-archive"></i>
+        <span>Backups</span>
+      </button>
+    </nav>
+
+  </div>
+
+  <!-- Modal: Configurações Mobile -->
+  <div class="mobile-modal-overlay hidden" id="modal-mobile-config">
+    <div class="mobile-modal-content">
+      <div class="mobile-modal-header">
+        <h3><i class="fa-solid fa-gear"></i> Configurações dos Consoles</h3>
+        <button class="btn-close" id="close-modal-mobile-config">&times;</button>
+      </div>
+      <div class="mobile-modal-body">
+        <form id="form-mobile-config">
+          <h4 class="section-title text-green"><i class="fa-solid fa-tv"></i> Console A (Local 1)</h4>
+          <div class="form-group">
+            <label>Nome Amigável</label>
+            <input type="text" id="cfg-name-a" required>
+          </div>
+          <div class="form-group">
+            <label>IP do Console (Rede Wi-Fi)</label>
+            <input type="text" id="cfg-ip-a" required>
+          </div>
+          <div class="form-group">
+            <label>Porta FTP</label>
+            <input type="number" id="cfg-port-a" value="21" required>
+          </div>
+
+          <h4 class="section-title text-cyan" style="margin-top: 16px;"><i class="fa-solid fa-tv"></i> Console B (Local 2)</h4>
+          <div class="form-group">
+            <label>Nome Amigável</label>
+            <input type="text" id="cfg-name-b" required>
+          </div>
+          <div class="form-group">
+            <label>IP do Console (Rede Wi-Fi)</label>
+            <input type="text" id="cfg-ip-b" required>
+          </div>
+          <div class="form-group">
+            <label>Porta FTP</label>
+            <input type="number" id="cfg-port-b" value="21" required>
+          </div>
+        </form>
+      </div>
+      <div class="mobile-modal-footer">
+        <button class="btn-mobile-primary" id="btn-save-mobile-config">Salvar Configurações</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="app.js"></script>
+</body>
+</html>
